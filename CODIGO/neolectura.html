@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>NeoLectura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1B7DCB; --bg:#DCEEF4; --card:#FFFFFF; --ink:#0B2A4A; --muted:#4F7391;
+  --teal:#35BFC0; --orange:#F26B1D; --gold:#FFC81E;
+  --line:#E6DAC6; --foot:#EAF5F8; --foot-ink:#7FAAC5;
+  --step-bg:#E7F3FC; --step-line:#A9D3F0; --q-bg:#FFF6CC; --q-line:#F2CF3A; --q-ink:#E3A900;
+  --lock-bg:#F0F8FB; --lock-ink:#8DB0C7; --lock-box:#DCE5EB;
+  --shadow:0 4px 14px rgba(20,90,140,.12);
+  --ok:#1E9A64; --bad:#D64545; --chip:#E7F3FC; --field:#F3FAFD;
+  --fs:1.0625rem; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --blue:#1A6FB5; --bg:#0C1B29; --card:#132A3D; --ink:#E6F2FA; --muted:#93B3CA; --teal:#3ED0D0;
+    --line:#3A4A55; --foot:#0F2334; --foot-ink:#6F95AF; --step-bg:#173650; --step-line:#2F6A9A;
+    --q-bg:#3A3210; --q-line:#9C8420; --q-ink:#FFC81E; --lock-bg:#102232; --lock-ink:#5F84A0; --lock-box:#1D3548;
+    --shadow:0 4px 14px rgba(0,0,0,.35); --ok:#3BC68B; --bad:#F06B6B; --chip:#173650; --field:#0F2334; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --blue:#1A6FB5; --bg:#0C1B29; --card:#132A3D; --ink:#E6F2FA; --muted:#93B3CA; --teal:#3ED0D0;
+  --line:#3A4A55; --foot:#0F2334; --foot-ink:#6F95AF; --step-bg:#173650; --step-line:#2F6A9A;
+  --q-bg:#3A3210; --q-line:#9C8420; --q-ink:#FFC81E; --lock-bg:#102232; --lock-ink:#5F84A0; --lock-box:#1D3548;
+  --shadow:0 4px 14px rgba(0,0,0,.35); --ok:#3BC68B; --bad:#F06B6B; --chip:#173650; --field:#0F2334; color-scheme:dark;
+}
+
+*{box-sizing:border-box;margin:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.35}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font:inherit}
+svg{display:block}
+.ico{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- Encabezados ---------- */
+.hdr{background:var(--blue);color:#fff;padding:0 20px;position:sticky;top:0;z-index:5}
+.hdr.home{height:76px;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-size:24px;font-weight:800;line-height:1.1}
+.hdr .sub{font-size:12px;font-weight:700;opacity:.9;margin-top:3px}
+.hdr .acts{display:flex;gap:12px}
+.rbtn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;color:#fff;transition:background .15s}
+.rbtn:hover{background:rgba(255,255,255,.34)}
+.hdr.bar{height:56px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.back{justify-self:start;display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.2);font-weight:800;font-size:14px;color:#fff}
+.back:hover{background:rgba(255,255,255,.34)}
+.hdr.bar h2{font-size:17px;font-weight:800;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56vw}
+
+/* ---------- Estructura ---------- */
+main{max-width:1400px;margin:0 auto;padding:17px 16px 32px}
+.doc{max-width:820px;margin:0 auto}
+.mcard{background:var(--card);border-radius:30px;box-shadow:var(--shadow);padding:0 24px;min-height:104px;display:flex;align-items:center;gap:20px}
+.mcard .mt{font-size:17px;font-weight:800;color:var(--blue)}
+.mcard .ms{font-size:14px;font-weight:600;color:var(--muted);margin-top:2px}
+.mcard .ms b{color:var(--teal);font-weight:800}
+.mcard .cnt{font-size:13px;font-weight:800;color:var(--teal);margin-top:4px}
+.stars{display:flex;gap:2px;margin-top:4px}
+.stars span{color:var(--step-line)}
+.stars span.on{color:var(--gold)}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:22px 4px 14px}
+.sec h3{font-size:20px;font-weight:800}
+.sec span{font-size:13px;font-weight:700;color:var(--muted)}
+
+/* ---------- Cuentos ---------- */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.story{position:relative;border-radius:26px;overflow:hidden;background:var(--card);border:3px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;text-align:left;width:100%}
+.story.open{border-color:var(--orange);cursor:pointer;transition:transform .15s}
+.story.open:hover{transform:translateY(-3px)}
+.cover{position:relative;aspect-ratio:3/4;overflow:hidden;background:#345}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:10px;right:10px;background:var(--teal);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px}
+.veil{position:absolute;inset:0;background:rgba(85,112,126,.74);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#fff;font-size:11px;font-weight:800}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:40px 14px 14px;text-align:center;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.cap b{display:block;font-size:clamp(14px,1.45vw,18px);font-weight:800}
+.cap i{font-style:normal;font-size:12px;font-weight:700;opacity:.88}
+.foot{height:26px;display:grid;place-items:center;background:var(--foot);color:var(--foot-ink);font-size:11px;font-weight:800}
+.story.open .foot{color:var(--teal)}
+.links{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.link{background:var(--card);border-radius:20px;box-shadow:var(--shadow);height:54px;display:flex;align-items:center;gap:14px;padding:0 20px;font-weight:800;font-size:16px;text-align:left}
+.link:hover{transform:translateY(-2px)}
+.link{transition:transform .15s}
+
+/* ---------- Niveles ---------- */
+.lvl{background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:16px 16px 14px;margin-top:18px;cursor:pointer}
+.lvl-top{display:flex;align-items:center;gap:16px}
+.num{width:56px;height:56px;border-radius:14px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:24px;font-weight:800;flex:none}
+.lvl-top .t{flex:1;min-width:0}
+.lvl-top h4{font-size:18px;font-weight:800}
+.lvl-top p{font-size:13px;color:var(--muted);font-weight:600}
+.lvl-top .go{color:var(--blue)}
+.lvl.locked{background:var(--lock-bg);box-shadow:none;cursor:default}
+.lvl.locked .num{background:var(--lock-box);color:var(--lock-ink)}
+.lvl.locked h4,.lvl.locked p{color:var(--lock-ink)}
+.steps{display:flex;align-items:flex-start;margin-top:14px}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:0}
+.step.q{flex:none;width:64px}
+.circ{width:40px;height:40px;border-radius:50%;border:2px solid var(--step-line);background:var(--step-bg);color:var(--blue);font-weight:800;font-size:14px;display:grid;place-items:center;transition:transform .15s}
+.step:hover .circ{transform:scale(1.08)}
+.circ.done{background:var(--blue);border-color:var(--blue);color:#fff}
+.circ.quiz{border-color:var(--q-line);background:var(--q-bg);color:var(--q-ink)}
+.circ.quiz.done{background:var(--gold);border-color:var(--gold);color:#5a3d00}
+.lab{font-size:10px;font-weight:700;color:var(--muted);max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arrow{height:40px;display:grid;place-items:center;padding:0 6px;color:var(--muted)}
+
+/* ---------- Lectura ---------- */
+.paper{background:var(--card);border-radius:26px;box-shadow:var(--shadow);overflow:hidden;margin-top:18px}
+.banner{height:170px;position:relative;background:#345}
+.banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.paper .in{padding:22px 24px 26px}
+.paper .in.center{text-align:center}
+.meta{font-size:13px;font-weight:800;color:var(--teal)}
+.paper h2{font-size:24px;font-weight:800;margin:4px 0 12px}
+.txt{font-size:var(--fs);line-height:1.75;font-weight:600;max-width:68ch}
+.vocab{border-bottom:2.5px dotted var(--teal);color:inherit;font:inherit;padding:0 1px;background:none}
+.vocab:hover{background:var(--chip)}
+.hint{font-size:13px;color:var(--muted);font-weight:600;margin-top:14px}
+.defbox{margin-top:12px;padding:12px 14px;border-radius:16px;background:var(--chip);font-size:15px;font-weight:600}
+.defbox[hidden]{display:none}
+.tools{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--step-line)}
+.dots i.on{background:var(--blue)}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:999px;font-weight:800;font-size:15px;transition:filter .15s}
+.btn:hover{filter:brightness(1.06)}
+.btn.pri{background:var(--blue);color:#fff}
+.btn.ghost{background:var(--chip);color:var(--blue)}
+.btn.gold{background:var(--gold);color:#5a3d00}
+.btn.danger{background:#FDECEC;color:#C43A3A}
+
+/* ---------- Quiz ---------- */
+.pbar{height:8px;border-radius:99px;background:var(--step-bg);margin:10px 0 18px;overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:99px;background:var(--teal);transition:width .3s}
+.qq{font-size:20px;font-weight:800}
+.opt{width:100%;text-align:left;padding:13px 16px;border-radius:16px;border:2px solid var(--step-line);background:var(--card);color:var(--ink);font-weight:700;font-size:16px;margin-top:10px;display:flex;gap:12px;align-items:center;transition:border-color .15s,background .15s}
+.opt:not(:disabled):hover{border-color:var(--blue);background:var(--chip)}
+.opt:disabled{cursor:default}
+.opt .k{width:28px;height:28px;border-radius:50%;background:var(--step-bg);display:grid;place-items:center;font-size:13px;font-weight:800;color:var(--blue);flex:none}
+.opt.ok{border-color:var(--ok);background:rgba(30,154,100,.13)}
+.opt.bad{border-color:var(--bad);background:rgba(214,69,69,.12)}
+.fb{margin-top:14px;padding:12px 14px;border-radius:14px;font-weight:700;font-size:15px}
+.fb.ok{background:rgba(30,154,100,.14);color:var(--ok)}
+.fb.bad{background:rgba(214,69,69,.12);color:var(--bad)}
+.bigstars{display:flex;justify-content:center;gap:8px;margin-bottom:8px}
+.bigstars span{color:var(--step-line)}
+.bigstars span.on{color:var(--gold);animation:pop .5s ease both}
+.bigstars span.on:nth-child(2){animation-delay:.12s}
+.bigstars span.on:nth-child(3){animation-delay:.24s}
+@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+.res-txt{font-size:16px;font-weight:600;color:var(--muted);margin:0 auto 18px;max-width:46ch}
+.res-btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+
+/* ---------- Ranking / opciones / créditos ---------- */
+.row{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:18px;background:var(--card);box-shadow:var(--shadow);margin-top:10px;border:2px solid transparent}
+.row.me{border-color:var(--teal)}
+.pos{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--chip);color:var(--blue);flex:none}
+.pos.g1{background:#FFD54A;color:#6b4a00}
+.pos.g2{background:#D5DDE4;color:#3d4a55}
+.pos.g3{background:#E5B584;color:#5b3416}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;flex:none}
+.row .nm{font-weight:800;font-size:16px}
+.row .nm small{font-weight:700;color:var(--teal);font-size:12px;margin-left:6px}
+.row .pts{margin-left:auto;font-weight:800;color:var(--teal)}
+.set{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:18px 20px;margin-top:14px}
+.set h4{font-size:16px;font-weight:800}
+.set p{font-size:13px;color:var(--muted);font-weight:600;margin-top:2px}
+.set.two{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.inp{width:100%;height:46px;border-radius:14px;border:2px solid var(--step-line);background:var(--field);padding:0 14px;font-weight:700;color:var(--ink);margin-top:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{padding:8px 16px;border-radius:999px;background:var(--chip);color:var(--blue);font-weight:800;font-size:14px}
+.chip.on{background:var(--blue);color:#fff}
+.set .prev{margin-top:12px;color:var(--ink);font-weight:600;line-height:1.5}
+.sw{width:52px;height:30px;border-radius:99px;background:var(--step-line);position:relative;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
+.sw.on{background:var(--teal)}
+.sw.on::after{left:25px}
+.credit p{font-size:15px;font-weight:600;color:var(--ink);line-height:1.6;margin-top:6px}
+.credit h4{display:flex;align-items:center;gap:10px}
+
+/* ---------- Ingreso, avisos y diálogos ---------- */
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.lcard{background:var(--card);border-radius:30px;box-shadow:var(--shadow);padding:28px 26px;width:100%;max-width:400px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.lcard h1{font-size:28px;font-weight:900;color:var(--blue)}
+.lcard p{font-size:15px;font-weight:600;color:var(--muted)}
+.lcard .inp{text-align:center;margin-bottom:10px}
+.modal{position:fixed;inset:0;background:rgba(6,25,45,.5);display:grid;place-items:center;z-index:20;padding:20px}
+.mbox{background:var(--card);border-radius:24px;padding:24px;max-width:360px;width:100%;text-align:center}
+.mbox p{font-weight:700;font-size:16px;margin-bottom:18px}
+.mrow{display:flex;gap:10px;justify-content:center}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:#0B2A4A;color:#fff;padding:10px 18px;border-radius:999px;font-weight:800;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:860px){
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .story{border-radius:22px}
+  .mcard{padding:0 18px;gap:14px}
+  .paper .in{padding:18px 18px 22px}
+  .banner{height:130px}
+}
+@media (max-width:420px){
+  .links{gap:10px}
+  .link{padding:0 14px;font-size:15px;gap:10px}
+  .hdr h1{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+'use strict';
+/* =====================  UTILIDADES  ===================== */
+const ESC=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const seed=s=>()=>((s=(s*16807)%2147483647)/2147483647);
+
+const ICON={
+ trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+ gear:'<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+ logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+ lock:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+ star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+ chev:'<path d="m9 18 6-6-6-6"/>',
+ back:'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+ right:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+ book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ vol:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>'
+};
+const ic=(n,s=20,fill=false)=>`<svg class="ico" viewBox="0 0 24 24" width="${s}" height="${s}"${fill?' style="fill:currentColor"':''} aria-hidden="true">${ICON[n]}</svg>`;
+
+/* Mascota: el libro con anteojos */
+const MASCOT=(w=56)=>`<svg viewBox="0 0 72 98" width="${w}" height="${Math.round(w*98/72)}" style="flex:none" aria-hidden="true">
+<g stroke="#12324f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M26 76v11M46 76v11" fill="none"/>
+<ellipse cx="23" cy="91" rx="9" ry="4.6" fill="#fff"/><ellipse cx="49" cy="91" rx="9" ry="4.6" fill="#fff"/>
+<path d="M10 45c-8 2-9 8-8 14" fill="none"/><circle cx="2.5" cy="60" r="3.6" fill="#F6D2A8"/>
+<path d="M62 44c8-2 9-9 8-17" fill="none"/><circle cx="69" cy="25" r="3.6" fill="#F6D2A8"/>
+<rect x="10" y="8" width="52" height="70" rx="7" fill="#2CB6E6"/>
+<path d="M10 15a7 7 0 0 1 7-7h6v70h-6a7 7 0 0 1-7-7z" fill="#1A8FC4"/>
+<path d="M62 16v54" stroke="#fff" stroke-width="3.4" fill="none"/>
+<circle cx="32" cy="32" r="10" fill="#fff"/><circle cx="53" cy="32" r="10" fill="#fff"/>
+<path d="M42 31h1" fill="none"/>
+<circle cx="33" cy="33" r="3.8" fill="#12324f" stroke="none"/><circle cx="52" cy="33" r="3.8" fill="#12324f" stroke="none"/>
+<circle cx="34.2" cy="31.8" r="1.2" fill="#fff" stroke="none"/><circle cx="53.2" cy="31.8" r="1.2" fill="#fff" stroke="none"/>
+<path d="M31 52q11 12 22 0z" fill="#fff"/>
+</g></svg>`;
+
+/* =====================  ILUSTRACIONES (SVG)  ===================== */
+const svgWrap=(inner,defs='')=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice"><defs>${defs}</defs>${inner}</svg>`;
+const ART={
+ lion(){
+  let mane='';
+  for(let i=0;i<14;i++){const a=i/14*Math.PI*2;mane+=`<circle cx="${(150+Math.cos(a)*76).toFixed(1)}" cy="${(190+Math.sin(a)*76).toFixed(1)}" r="30" fill="${i%2?'#a2520f':'#b8631c'}"/>`}
+  return svgWrap(`
+  <rect width="300" height="400" fill="url(#a)"/>
+  <circle cx="240" cy="70" r="34" fill="#fff0b3" opacity=".9"/>
+  <path d="M0 300Q90 262 170 292T300 278V400H0Z" fill="#8a6a2a"/>
+  <path d="M0 338Q100 306 200 338T300 328V400H0Z" fill="#5f8a38"/>
+  <rect x="40" y="236" width="7" height="70" fill="#3b2a14"/><ellipse cx="44" cy="232" rx="42" ry="12" fill="#2f4a1f"/>
+  ${mane}
+  <circle cx="108" cy="146" r="15" fill="#f2bd6e"/><circle cx="192" cy="146" r="15" fill="#f2bd6e"/>
+  <circle cx="108" cy="146" r="7" fill="#d98b4b"/><circle cx="192" cy="146" r="7" fill="#d98b4b"/>
+  <circle cx="150" cy="190" r="70" fill="#b8631c"/>
+  <circle cx="150" cy="198" r="54" fill="#f2bd6e"/>
+  <ellipse cx="150" cy="218" rx="25" ry="18" fill="#fbe3b8"/>
+  <circle cx="131" cy="188" r="5.5" fill="#2b1a0e"/><circle cx="169" cy="188" r="5.5" fill="#2b1a0e"/>
+  <circle cx="133" cy="186" r="1.8" fill="#fff"/><circle cx="171" cy="186" r="1.8" fill="#fff"/>
+  <path d="M139 208h22l-11 11z" fill="#4f2a14"/>
+  <path d="M150 219v9M150 228q-10 9-19 1M150 228q10 9 19 1" stroke="#4f2a14" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <g transform="translate(58 352)"><path d="M-15 2q-16-4-20 8" stroke="#f4a6b6" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse cx="0" cy="0" rx="17" ry="11" fill="#a7b0b8"/><circle cx="18" cy="-4" r="9" fill="#b7c0c8"/>
+  <circle cx="14" cy="-13" r="5.5" fill="#f4a6b6"/><circle cx="23" cy="-13" r="5.5" fill="#f4a6b6"/>
+  <circle cx="21" cy="-6" r="1.7" fill="#222"/><circle cx="27" cy="-3" r="2.2" fill="#f4a6b6"/></g>`,
+  '<linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7c266"/><stop offset=".6" stop-color="#ee8f4e"/><stop offset="1" stop-color="#d9673f"/></linearGradient>');
+ },
+ storm(){
+  const r=seed(7);let grass='';
+  for(let i=0;i<80;i++){const x=r()*300,y=268+r()*132,h=14+r()*26;grass+=`<path d="M${x.toFixed(1)} ${y.toFixed(1)}q${(r()*8-4).toFixed(1)} -${(h/2).toFixed(1)} ${(r()*10-5).toFixed(1)} -${h.toFixed(1)}" stroke="${r()>.5?'#e0a655':'#b97a34'}" stroke-width="2" fill="none" stroke-linecap="round"/>`}
+  return svgWrap(`
+  <rect width="300" height="400" fill="url(#s)"/>
+  <g fill="#0d1319" opacity=".85"><ellipse cx="60" cy="40" rx="90" ry="34"/><ellipse cx="210" cy="30" rx="100" ry="38"/><ellipse cx="292" cy="72" rx="60" ry="30"/></g>
+  <polygon points="176,0 146,110 172,110 132,215 206,92 178,92 212,0" fill="#fff" opacity=".6" filter="url(#b)"/>
+  <polygon points="176,0 146,110 172,110 132,215 206,92 178,92 212,0" fill="#fffbe0"/>
+  <polygon points="70,20 55,90 72,90 50,150 92,76 76,76 96,20" fill="#fff" opacity=".85"/>
+  <path d="M0 262Q80 246 160 258T300 252V400H0Z" fill="url(#f)"/>
+  <rect x="34" y="216" width="8" height="46" fill="#1b140e"/><circle cx="38" cy="204" r="26" fill="#1c2618"/><circle cx="20" cy="218" r="16" fill="#1c2618"/><circle cx="58" cy="218" r="16" fill="#1c2618"/>
+  ${grass}
+  <path d="M128 400L172 400L156 262L146 262Z" fill="#d8b07a" opacity=".45"/>
+  <g stroke="#e3c46a" stroke-width="3" fill="none" stroke-linecap="round"><path d="M252 400Q252 322 286 292"/><path d="M270 400Q272 340 298 322"/><path d="M236 400Q238 340 268 318"/></g>`,
+  '<linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10171f"/><stop offset=".55" stop-color="#3c4a55"/><stop offset="1" stop-color="#7b7f80"/></linearGradient><linearGradient id="f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a2b"/><stop offset="1" stop-color="#c58b45"/></linearGradient><filter id="b"><feGaussianBlur stdDeviation="4"/></filter>');
+ },
+ space(){
+  let bolts='';
+  for(let i=0;i<8;i++){const a=i/8*Math.PI*2+.4;bolts+=`<circle cx="${(150+Math.cos(a)*126).toFixed(1)}" cy="${(200+Math.sin(a)*126).toFixed(1)}" r="5" fill="#6a717a"/>`}
+  return svgWrap(`
+  <rect width="300" height="400" fill="#171b20"/>
+  <circle cx="150" cy="200" r="138" fill="#2b3037"/>
+  <circle cx="150" cy="200" r="118" fill="none" stroke="#454c55" stroke-width="8"/>
+  ${bolts}
+  <circle cx="150" cy="200" r="102" fill="url(#e)"/>
+  <g clip-path="url(#c)"><path d="M85 150q30-26 62-8q14 28-18 46q-30 8-44-38z" fill="#4a9a52" opacity=".85"/><path d="M170 220q28-12 46 12q-4 32-38 34q-22-20-8-46z" fill="#4a9a52" opacity=".85"/>
+  <ellipse cx="130" cy="196" rx="40" ry="8" fill="#fff" opacity=".55"/><ellipse cx="190" cy="160" rx="34" ry="7" fill="#fff" opacity=".5"/><ellipse cx="110" cy="250" rx="36" ry="7" fill="#fff" opacity=".45"/>
+  <ellipse cx="115" cy="150" rx="46" ry="22" fill="#fff" opacity=".12" transform="rotate(-30 115 150)"/></g>`,
+  '<radialGradient id="e" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#3f9be0"/><stop offset=".7" stop-color="#1c5fa8"/><stop offset="1" stop-color="#0b2a4d"/></radialGradient><clipPath id="c"><circle cx="150" cy="200" r="102"/></clipPath>');
+ },
+ pigs(){
+  return svgWrap(`
+  <rect width="300" height="400" fill="url(#p)"/>
+  <circle cx="240" cy="60" r="30" fill="#fff3b0"/>
+  <path d="M0 320Q100 280 200 314T300 300V400H0Z" fill="#79b94a"/>
+  <polygon points="98,124 116,78 148,114" fill="#f19cb0"/><polygon points="202,124 184,78 152,114" fill="#f19cb0"/>
+  <circle cx="150" cy="190" r="70" fill="#f7b0c2"/>
+  <ellipse cx="150" cy="214" rx="32" ry="24" fill="#f28ba5"/>
+  <ellipse cx="139" cy="214" rx="4.5" ry="7.5" fill="#c9506f"/><ellipse cx="161" cy="214" rx="4.5" ry="7.5" fill="#c9506f"/>
+  <circle cx="122" cy="174" r="6.5" fill="#3a2030"/><circle cx="178" cy="174" r="6.5" fill="#3a2030"/>
+  <circle cx="124" cy="172" r="2" fill="#fff"/><circle cx="180" cy="172" r="2" fill="#fff"/>
+  <g transform="translate(0 322)"><rect x="24" y="14" width="46" height="34" fill="#e8c95a"/><polygon points="16,16 47,-8 78,16" fill="#c9a233"/>
+  <rect x="127" y="14" width="46" height="34" fill="#a5703d"/><polygon points="119,16 150,-8 181,16" fill="#6e4423"/>
+  <rect x="230" y="14" width="46" height="34" fill="#c6553d"/><polygon points="222,16 253,-8 284,16" fill="#8f3524"/></g>`,
+  '<linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9dcf7"/><stop offset="1" stop-color="#e9f7ff"/></linearGradient>');
+ },
+ hansel(){
+  const t=[[20,250,60],[80,270,50],[230,260,64],[275,280,46],[180,285,40]].map(([x,y,s])=>`<polygon points="${x-s/2},${y} ${x},${y-s*1.6} ${x+s/2},${y}" fill="#173222"/>`).join('');
+  return svgWrap(`
+  <rect width="300" height="400" fill="url(#h)"/>${t}
+  <rect x="0" y="300" width="300" height="100" fill="#2f5a34"/>
+  <rect x="90" y="236" width="120" height="86" fill="#b06a34"/>
+  <polygon points="72,240 150,166 228,240" fill="#7b4620"/>
+  <path d="M72 240q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0q9 14 18 0z" fill="#f7efe0"/>
+  <rect x="134" y="268" width="32" height="54" rx="6" fill="#5b2f12"/><rect x="100" y="256" width="24" height="24" rx="4" fill="#ffd86b"/><rect x="176" y="256" width="24" height="24" rx="4" fill="#ffd86b"/>
+  <circle cx="120" cy="212" r="6" fill="#e5484d"/><circle cx="150" cy="200" r="6" fill="#ffd86b"/><circle cx="180" cy="212" r="6" fill="#4cc38a"/><circle cx="135" cy="222" r="5" fill="#ff8cc6"/><circle cx="168" cy="224" r="5" fill="#6ec1ff"/>`,
+  '<linearGradient id="h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e3b2a"/><stop offset="1" stop-color="#4f7a4a"/></linearGradient>');
+ },
+ castle(){
+  const r=seed(3);let st='';
+  for(let i=0;i<40;i++)st+=`<circle cx="${(r()*300).toFixed(0)}" cy="${(r()*200).toFixed(0)}" r="${(r()*1.6+.6).toFixed(1)}" fill="#fff" opacity=".8"/>`;
+  return svgWrap(`
+  <rect width="300" height="400" fill="url(#c)"/>${st}
+  <circle cx="230" cy="80" r="30" fill="#ffeeb0"/><circle cx="240" cy="72" r="26" fill="#a25a9c" opacity=".0"/>
+  <g fill="#21103a"><rect x="80" y="220" width="140" height="110"/><rect x="62" y="180" width="44" height="150"/><rect x="194" y="180" width="44" height="150"/><rect x="130" y="150" width="40" height="80"/>
+  <polygon points="56,182 84,130 112,182"/><polygon points="188,182 216,130 244,182"/><polygon points="124,152 150,96 176,152"/><rect x="0" y="320" width="300" height="80"/></g>
+  <g fill="#ffd86b"><rect x="76" y="200" width="10" height="16" rx="5"/><rect x="214" y="200" width="10" height="16" rx="5"/><rect x="145" y="172" width="10" height="16" rx="5"/><rect x="120" y="260" width="12" height="20" rx="6"/><rect x="168" y="260" width="12" height="20" rx="6"/></g>
+  <path d="M136 330v-40a14 14 0 0 1 28 0v40z" fill="#0f0720"/>`,
+  '<linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d1b4e"/><stop offset=".7" stop-color="#8b4a94"/><stop offset="1" stop-color="#e58bb0"/></linearGradient>');
+ }
+};
+const COVER={};
+function cover(s){return s.img||(COVER[s.id]||(COVER[s.id]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ART[s.art]())))}
+
+/* =====================  CONTENIDO  ===================== */
+/* Para usar tus propias fotos: agrega  img:'ruta/foto.jpg'  a cualquier cuento. */
+const STORIES=[
+ {id:'leon',title:'El León y el Ratón',genre:'Fábula',art:'lion',open:true,levels:[
+  {name:'El Encuentro',parts:[
+   {t:'El sueño del león',x:'Era una tarde muy calurosa en la {sabana|Llanura enorme con mucho pasto y pocos árboles.}. El gran león, cansado de tanto caminar, se tumbó a la sombra de un árbol y se quedó profundamente dormido. Los demás animales pasaban de puntillas para no despertar al rey.'},
+   {t:'El tropiezo del ratón',x:'Un ratoncito que buscaba semillas no vio al león y, sin querer, corrió por encima de su {melena|El pelo largo y abundante que rodea la cabeza del león.}. ¡Zas! El león abrió un ojo, luego el otro, y con su enorme pata atrapó al pobre ratón.'},
+   {t:'El trato',x:'—¡Perdón, majestad! —chilló el ratón—. Si me deja ir, algún día se lo pagaré. ¡Le prometo que lo ayudaré! El león soltó una carcajada: ¿cómo podría ayudarlo alguien tan pequeño? Pero se sintió generoso y lo dejó libre.'}],
+   quiz:[{q:'¿Dónde se quedó dormido el león?',o:['A la sombra de un árbol','Dentro de una cueva','Junto al río'],a:0},
+         {q:'¿Qué le prometió el ratón al león?',o:['Traerle comida','Ayudarlo algún día','No molestarlo nunca más'],a:1}]},
+  {name:'La Promesa Cumplida',parts:[
+   {t:'La trampa',x:'Pasaron los días. Una mañana, unos cazadores atraparon al león en una gruesa red de cuerdas. Por más que {rugía|Hacía el sonido fuerte y grave de los leones.} y se sacudía, no lograba soltarse.'},
+   {t:'El rugido lejano',x:'El ratón escuchó unos rugidos a lo lejos y reconoció esa voz al instante. —¡Es mi amigo el león! —pensó, y salió corriendo hacia el lugar tan rápido como se lo permitieron sus patitas.'},
+   {t:'Dientes pequeños',x:'El ratoncito trepó por la red y comenzó a {roer|Cortar algo con los dientes, de a poquito.} las cuerdas, una por una. Después de un buen rato, la red se abrió y el león quedó libre.'}],
+   quiz:[{q:'¿Cómo atraparon al león los cazadores?',o:['Con una red de cuerdas','Con un pozo profundo','Con una jaula de hierro'],a:0},
+         {q:'¿Cómo liberó el ratón al león?',o:['Empujando la red','Royendo las cuerdas','Llamando a otros animales'],a:1}]},
+  {name:'Una Amistad Inesperada',parts:[
+   {t:'Te debo la vida',x:'—Nunca creí que alguien tan pequeño pudiera salvarme —dijo el león, emocionado—. Te debo la vida, amigo. El ratón sonrió: —Una promesa es una promesa, majestad.'},
+   {t:'Dos amigos inseparables',x:'Desde ese día, el león y el ratón se hicieron {inseparables|Que siempre están juntos y no quieren separarse.}. Compartían la sombra del árbol y, mientras el león descansaba, el ratón le contaba historias de sus aventuras entre los pastizales.'},
+   {t:'Lo que dijo la sabana',x:'Los demás animales no lo podían creer: ¡el rey de la sabana, amigo de un ratón! Pero al verlos tan felices juntos, comprendieron que la amistad no se mide por el tamaño.'}],
+   quiz:[{q:'¿Qué le dijo el león al ratón después de ser liberado?',o:['Que le debía la vida','Que se fuera de la sabana','Que volviera mañana'],a:0},
+         {q:'¿Qué comprendieron los demás animales?',o:['Que los leones son los mejores amigos','Que la amistad no se mide por el tamaño','Que los ratones son muy rápidos'],a:1}]},
+  {name:'El Valor de lo Pequeño',parts:[
+   {t:'La pregunta de la jirafa',x:'Un día, una jirafa le preguntó al ratón: —¿No te da miedo andar con un león? El ratón pensó un momento y respondió: —Al principio sí, pero descubrí que el valor no depende del tamaño.'},
+   {t:'Lo que aprendió el ratón',x:'El ratón siempre creyó que era demasiado chico para hacer cosas importantes. Ahora sabía que un gesto {valiente|Que actúa con coraje, aun cuando siente miedo.} puede cambiarlo todo, incluso si lo hace alguien pequeño.'},
+   {t:'Lo que aprendió el león',x:'El león también aprendió algo valioso: ser rey no es solo tener fuerza, sino saber ser amable y agradecido con quienes te ayudan.'}],
+   quiz:[{q:'¿Qué descubrió el ratón sobre el valor?',o:['Que solo lo tienen los grandes','Que se pierde con el miedo','Que no depende del tamaño'],a:2},
+         {q:'¿Qué aprendió el león?',o:['Que ser rey es solo tener fuerza','Que hay que ser amable y agradecido','Que los ratones son peligrosos'],a:1}]},
+  {name:'La Gran Lección',parts:[
+   {t:'La moraleja',x:'Toda fábula termina con una {moraleja|Enseñanza que deja una historia.}. La de esta es clara: la bondad siempre regresa. Quien ayuda hoy puede recibir ayuda mañana, aunque no lo espere.'},
+   {t:'Nadie es demasiado pequeño',x:'También aprendimos que nadie es demasiado pequeño para ayudar ni demasiado grande para dar las gracias. Cada uno, a su manera, puede hacer algo importante por los demás.'},
+   {t:'Ahora te toca a ti',x:'Piensa: ¿a quién puedes ayudar hoy? Compartir un lápiz, prestar un cuaderno o regalar una sonrisa son pequeños gestos que, como el del ratón, pueden ser enormes.'}],
+   quiz:[{q:'¿Cuál es la moraleja de la fábula?',o:['Que los fuertes siempre ganan','Que la bondad siempre regresa','Que hay que evitar a los ratones'],a:1},
+         {q:'Según la fábula, ¿quién puede ayudar a los demás?',o:['Solo los más grandes','Solo los más rápidos','Cualquiera, sin importar su tamaño'],a:2}]}
+ ]},
+ {id:'roble',title:'El Roble y la Caña',genre:'Fábula',art:'storm',open:true,levels:[
+  {name:'El Roble Orgulloso',parts:[
+   {t:'El roble presumido',x:'En la orilla de un río crecían un {roble|Árbol grande y fuerte, de tronco grueso y madera dura.} enorme y una delgada caña. El roble, muy orgulloso de su altura, miraba a todos desde arriba y presumía de su fuerza.'},
+   {t:'La humilde caña',x:'—Pobre caña —decía el roble—. Cualquier brisa te hace temblar. Yo, en cambio, soy tan fuerte que nada me mueve. La caña no respondía; solo se mecía con el viento, tranquila.'},
+   {t:'Nubes en el cielo',x:'Una tarde, el cielo se llenó de nubes oscuras. Las aves volaron a esconderse y el aire se volvió frío. El roble levantó sus ramas, seguro de que nada podría contra él.'}],
+   quiz:[{q:'¿Dónde crecían el roble y la caña?',o:['En la orilla de un río','En lo alto de una montaña','En medio del desierto'],a:0},
+         {q:'¿De qué presumía el roble?',o:['De sus frutos dulces','De su altura y su fuerza','De sus flores'],a:1}]},
+  {name:'La Tormenta',parts:[
+   {t:'El viento llega',x:'De pronto comenzó a soplar un viento muy fuerte. Las hojas volaban por el aire y el río se llenó de olas.'},
+   {t:'La caña se inclina',x:'La caña, al sentir el viento, se inclinó hasta casi tocar el agua. Cuando el viento pasaba, ella volvía a levantarse, una y otra vez.'},
+   {t:'El roble resiste',x:'El roble, en cambio, se puso rígido. —¡A mí nadie me dobla! —gritó. Pero el viento sopló cada vez más fuerte y sus ramas empezaron a crujir.'}],
+   quiz:[{q:'¿Qué hizo la caña cuando llegó el viento?',o:['Se inclinó','Salió corriendo','Se quebró'],a:0},
+         {q:'¿Cómo reaccionó el roble?',o:['Se dobló como la caña','Se puso rígido y resistió','Pidió ayuda'],a:1}]},
+  {name:'El Crujido del Roble',parts:[
+   {t:'Lluvia y truenos',x:'Cayó una lluvia {torrencial|Muy fuerte y abundante.} y los truenos retumbaron en todo el valle. Los relámpagos iluminaban el campo como si fuera de día.'},
+   {t:'Cada vez más fuerte',x:'El viento no se cansaba. La caña seguía doblándose con cada ráfaga y el roble seguía firme, aunque ya nadie escuchaba sus palabras orgullosas.'},
+   {t:'¡Crac!',x:'Entonces se oyó un enorme ¡CRAC! Una ráfaga gigante arrancó al roble de raíz y lo arrojó al río. Sus ramas quedaron flotando en el agua.'}],
+   quiz:[{q:'¿Qué le pasó al roble?',o:['Perdió solo unas hojas','Fue arrancado de raíz','Se convirtió en caña'],a:1},
+         {q:'¿Qué se oyó cuando el roble cayó?',o:['Una suave canción','Un susurro','Un fuerte ¡CRAC!'],a:2}]},
+  {name:'Después del Viento',parts:[
+   {t:'Vuelve la calma',x:'Cuando la tormenta terminó, el cielo se aclaró y salió el sol. Todo el campo estaba en silencio y brillaba de agua.'},
+   {t:'La sorpresa del roble',x:'El roble, tendido en el río, miró a la caña sin poder creerlo: —¿Cómo es que tú, tan delgada, sigues en pie, y yo, tan fuerte, he caído?'},
+   {t:'La respuesta de la caña',x:'La caña sonrió y respondió con dulzura: —Tú luchaste contra el viento con tu fuerza. Yo, en cambio, me incliné ante él, y por eso sigo aquí.'}],
+   quiz:[{q:'¿Cómo estaba el campo cuando terminó la tormenta?',o:['Lleno de niebla','En silencio y brillando de agua','Cubierto de nieve'],a:1},
+         {q:'¿Por qué seguía en pie la caña?',o:['Porque se inclinó ante el viento','Porque era más alta','Porque tenía raíces enormes'],a:0}]},
+  {name:'La Lección del Campo',parts:[
+   {t:'Ser flexible',x:'La fábula nos enseña que ser {flexible|Que se dobla sin romperse; también, que sabe adaptarse a los cambios.} es una gran virtud. A veces, ceder un poco nos ayuda a no perderlo todo.'},
+   {t:'Fuerza y humildad',x:'La fuerza sirve, pero sin humildad puede volverse un problema. Quien escucha a los demás y sabe adaptarse suele salir adelante.'},
+   {t:'Tu turno',x:'Piensa en alguna situación en la que fue mejor ceder que discutir. ¿Cómo te sentiste después? Seguro fuiste tan sabio como la caña.'}],
+   quiz:[{q:'¿Qué virtud muestra la caña?',o:['El orgullo','La flexibilidad y la humildad','La velocidad'],a:1},
+         {q:'¿Qué nos enseña la fábula?',o:['Que hay que resistir siempre sin doblarse','Que los árboles grandes son invencibles','Que a veces ceder nos ayuda a salir adelante'],a:2}]}
+ ]},
+ {id:'astro',title:'El Pequeño Astronauta',genre:'Aventura',art:'space',open:false},
+ {id:'cerditos',title:'Los Tres Cerditos',genre:'Clásico',art:'pigs',open:false},
+ {id:'hansel',title:'Hansel y Gretel',genre:'Cuento clásico',art:'hansel',open:false},
+ {id:'bella',title:'La Bella Durmiente',genre:'Fantasía',art:'castle',open:false}
+];
+const RIVALS=[['Sofía R.',2480],['Mateo G.',2130],['Lucía P.',1870],['Benjamín',1640],['Camila',980],['Thiago',760],['Martina',540],['Emilia',320]];
+const SIZES=['1.0625rem','1.3rem','1.6rem'],SIZE_NAMES=['Normal','Grande','Muy grande'];
+const PARTS=3;
+
+/* =====================  ESTADO  ===================== */
+const KEY='neolectura.v1';
+const DEF={name:'Valentín',points:1250,parts:{},quiz:{},done:{},size:0,voice:true,theme:'auto',out:false};
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let S=Object.assign({},DEF,load()||{});
+let R={s:'home'},Q=null;
+
+const story=id=>STORIES.find(s=>s.id===id);
+const kd=(sid,l)=>sid+':'+l, kp=(sid,l,p)=>sid+':'+l+':'+p;
+const doneCount=sid=>story(sid).levels.filter((_,i)=>S.done[kd(sid,i)]).length;
+const totalDone=()=>STORIES.filter(s=>s.open).reduce((a,s)=>a+doneCount(s.id),0);
+const unlocked=(sid,l)=>l===0||!!S.done[kd(sid,l-1)];
+const partsRead=(sid,l)=>{let n=0;for(let p=0;p<PARTS;p++)if(S.parts[kp(sid,l,p)])n++;return n};
+const starCount=()=>S.points>=1200?3:S.points>=600?2:S.points>=200?1:0;
+const started=sid=>Object.keys(S.parts).some(k=>k.indexOf(sid+':')===0);
+const plain=t=>t.replace(/\{([^|}]+)\|[^}]+\}/g,'$1');
+const vocab=t=>t.replace(/\{([^|}]+)\|([^}]+)\}/g,(m,w,d)=>`<button class="vocab" data-a="def" data-w="${ESC(w)}" data-d="${ESC(d)}">${w}</button>`);
+const canSpeak=typeof window!=='undefined'&&'speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
+
+/* =====================  PANTALLAS  ===================== */
+const bar=(title,back)=>`<header class="hdr bar"><button class="back" data-a="nav" data-to="${back}">${ic('back',16)} Volver</button><h2>${ESC(title)}</h2><span></span></header>`;
+
+function starsRow(){const n=starCount();return `<div class="stars" aria-label="${n} de 3 estrellas">${[0,1,2].map(i=>`<span class="${i<n?'on':''}">${ic('star',16,true)}</span>`).join('')}</div>`}
+
+function storyCard(s){
+  const img=cover(s);
+  if(s.open){
+    const n=doneCount(s.id),st=started(s.id);
+    return `<article class="story open" data-a="nav" data-to="levels:${s.id}" role="button" tabindex="0" aria-label="Abrir ${ESC(s.title)}">
+      <div class="cover"><img src="${img}" alt="">${st?'':'<span class="badge">¡Nuevo!</span>'}
+      <div class="cap"><b>${ESC(s.title)}</b><i>${ESC(s.genre)}</i></div></div>
+      <div class="foot">${st?`Continuar · ${n}/${s.levels.length} niveles`:'¡A leer!'}</div></article>`;
+  }
+  return `<article class="story" aria-disabled="true"><div class="cover"><img src="${img}" alt="">
+    <div class="veil">${ic('lock',26)}<span>Próximamente</span></div>
+    <div class="cap"><b>${ESC(s.title)}</b><i>${ESC(s.genre)}</i></div></div><div class="foot">Bloqueado</div></article>`;
+}
+
+function homeScreen(){
+  return `<header class="hdr home"><div><h1>NeoLectura</h1><div class="sub">Bienvenido, ${ESC(S.name)} 👋</div></div>
+    <div class="acts">
+      <button class="rbtn" data-a="nav" data-to="ranking" aria-label="Ranking">${ic('trophy',18)}</button>
+      <button class="rbtn" data-a="nav" data-to="settings" aria-label="Opciones">${ic('gear',18)}</button>
+      <button class="rbtn" data-a="logout" aria-label="Salir">${ic('logout',18)}</button>
+    </div></header>
+  <main>
+    <section class="mcard">${MASCOT()}<div><div class="mt">¡Elige un cuento!</div><div class="ms">Tienes <b>${fmt(S.points)} puntos</b></div>${starsRow()}</div></section>
+    <div class="sec"><h3>Mis Cuentos</h3><span>${totalDone()} niveles completados</span></div>
+    <div class="grid">${STORIES.map(storyCard).join('')}</div>
+    <div class="links">
+      <button class="link" data-a="nav" data-to="ranking"><span style="color:#F2A900">${ic('trophy',24)}</span>Ranking</button>
+      <button class="link" data-a="nav" data-to="credits"><span style="color:var(--teal)">${ic('book',24)}</span>Créditos</button>
+    </div>
+  </main>`;
+}
+
+function levelsScreen(sid){
+  const s=story(sid),n=s.levels.length;
+  const lv=s.levels.map((L,i)=>{
+    if(!unlocked(sid,i))return `<div class="lvl locked"><div class="lvl-top"><div class="num">${ic('lock',22)}</div><div class="t"><h4>Nivel ${i+1}: ${ESC(L.name)}</h4><p>Bloqueado</p></div></div></div>`;
+    const dn=!!S.done[kd(sid,i)];
+    const steps=L.parts.map((p,j)=>{const r=!!S.parts[kp(sid,i,j)];
+      return `<div class="step" data-a="nav" data-to="read:${sid}:${i}:${j}" role="button" tabindex="0" title="${ESC(p.t)}"><div class="circ ${r?'done':''}">${r?ic('check',18):j+1}</div><span class="lab">${ESC(p.t)}</span></div>`}).join('');
+    return `<div class="lvl" data-a="cont" data-s="${sid}" data-l="${i}" role="button" tabindex="0">
+      <div class="lvl-top"><div class="num">${i+1}</div><div class="t"><h4>Nivel ${i+1}: ${ESC(L.name)}</h4><p>${dn?'Completado ✓':'En progreso'}</p></div><span class="go">${ic('chev',22)}</span></div>
+      <div class="steps">${steps}<div class="arrow">${ic('right',16)}</div>
+      <div class="step q" data-a="nav" data-to="quiz:${sid}:${i}" role="button" tabindex="0"><div class="circ quiz ${dn?'done':''}">${ic('star',20,dn)}</div><span class="lab">Quiz</span></div></div></div>`;
+  }).join('');
+  return bar(s.title,'home')+`<main><div class="doc" style="max-width:none">
+    <section class="mcard" style="min-height:102px;border-radius:24px">${MASCOT()}<div><div class="mt">¡Selecciona un nivel!</div><div class="ms">Cada nivel tiene 3 partes + un quiz.</div><div class="cnt">${doneCount(sid)}/${n} niveles completados</div></div></section>
+    ${lv}</div></main>`;
+}
+
+function readScreen(r){
+  const s=story(r.sid),L=s.levels[r.l],P=L.parts[r.p];
+  const last=r.p===PARTS-1,pos=['50% 22%','50% 50%','50% 82%'][r.p%3];
+  return bar(s.title,'levels:'+r.sid)+`<main><div class="doc"><article class="paper">
+    <div class="banner"><img src="${cover(s)}" alt="" style="object-position:${pos}"></div>
+    <div class="in"><div class="meta">Nivel ${r.l+1}: ${ESC(L.name)} · Parte ${r.p+1} de ${PARTS}</div>
+    <h2>${ESC(P.t)}</h2>
+    <p class="txt">${vocab(P.x)}</p>
+    ${P.x.indexOf('{')>-1?'<p class="hint">Toca las palabras subrayadas para ver qué significan.</p>':''}
+    <div class="defbox" id="def" hidden></div>
+    <div class="tools">${canSpeak&&S.voice?`<button class="btn ghost" data-a="speak">${ic('vol',18)} Escuchar</button>`:'<span></span>'}
+      <div class="dots" aria-hidden="true">${[0,1,2].map(i=>`<i class="${i===r.p?'on':''}"></i>`).join('')}</div></div>
+    <div class="nav">${r.p>0?`<button class="btn ghost" data-a="nav" data-to="read:${r.sid}:${r.l}:${r.p-1}">${ic('back',16)} Anterior</button>`:'<span></span>'}
+      <button class="btn ${last?'gold':'pri'}" data-a="next">${last?'Ir al Quiz '+ic('star',18,true):'Siguiente '+ic('right',16)}</button></div>
+    </div></article></div></main>`;
+}
+
+function quizScreen(){
+  const s=story(Q.sid),L=s.levels[Q.l],n=L.quiz.length;
+  const head=bar('Quiz · Nivel '+(Q.l+1),'levels:'+Q.sid);
+  if(Q.end){
+    const r=Q.res,lastLv=Q.l===s.levels.length-1;
+    const msg=[`Acertaste ${Q.score} de ${n}.`];
+    if(r.delta)msg.push(`Ganaste +${fmt(r.delta)} puntos.`);
+    if(r.bonus)msg.push(`Bono por completar el nivel: +${r.bonus}.`);
+    if(!r.pass)msg.push('Repasa las partes del nivel y vuelve a intentarlo.');
+    if(r.pass&&lastLv)msg.push('¡Terminaste todo el cuento!');
+    const btns=r.pass
+      ?(lastLv?`<button class="btn pri" data-a="nav" data-to="home">Volver a mis cuentos</button>`
+              :`<button class="btn ghost" data-a="nav" data-to="levels:${Q.sid}">Ver niveles</button><button class="btn pri" data-a="nav" data-to="read:${Q.sid}:${Q.l+1}:0">Siguiente nivel ${ic('right',16)}</button>`)
+      :`<button class="btn ghost" data-a="nav" data-to="levels:${Q.sid}">Repasar</button><button class="btn pri" data-a="nav" data-to="quiz:${Q.sid}:${Q.l}">Reintentar</button>`;
+    return head+`<main><div class="doc"><div class="paper"><div class="in center" style="padding-top:28px">
+      <div class="bigstars">${Array.from({length:n},(_,i)=>`<span class="${i<Q.score?'on':''}">${ic('star',48,true)}</span>`).join('')}</div>
+      <h2>${r.pass?'¡Nivel completado!':'¡Casi lo logras!'}</h2><p class="res-txt">${msg.join(' ')}</p><div class="res-btns">${btns}</div></div></div></div></main>`;
+  }
+  const q=L.quiz[Q.i],pk=Q.pick;
+  const opts=q.o.map((t,k)=>{let c='opt';if(pk!=null){if(k===q.a)c+=' ok';else if(k===pk)c+=' bad'}
+    return `<button class="${c}" data-a="pick" data-i="${k}" ${pk!=null?'disabled':''}><span class="k">${'ABC'[k]}</span>${ESC(t)}</button>`}).join('');
+  const fb=pk==null?'':pk===q.a?'<div class="fb ok" role="status">¡Muy bien! 🎉</div>':`<div class="fb bad" role="status">Casi. La respuesta correcta era: <b>${ESC(q.o[q.a])}</b></div>`;
+  return head+`<main><div class="doc"><div class="paper"><div class="in">
+    <div class="meta">Pregunta ${Q.i+1} de ${n}</div>
+    <div class="pbar"><i style="width:${(Q.i+(pk!=null?1:0))/n*100}%"></i></div>
+    <div class="qq">${ESC(q.q)}</div>${opts}${fb}
+    ${pk!=null?`<div class="nav"><span></span><button class="btn pri" data-a="qnext">${Q.i+1<n?'Siguiente':'Ver resultado'} ${ic('right',16)}</button></div>`:''}
+    </div></div></div></main>`;
+}
+
+const AVC=['#F26B1D','#35BFC0','#1B7DCB','#8E63D4','#E0568A','#3BAA6B','#D99A00','#5C7CFA','#E06666'];
+function rankScreen(){
+  const list=RIVALS.map(([n,p])=>({n,p,me:false})).concat({n:S.name,p:S.points,me:true}).sort((a,b)=>b.p-a.p);
+  const pos=list.findIndex(x=>x.me)+1;
+  const rows=list.map((x,i)=>`<div class="row ${x.me?'me':''}"><div class="pos ${i<3?'g'+(i+1):''}">${i+1}</div>
+    <div class="av" style="background:${AVC[(x.n.charCodeAt(0)+i)%AVC.length]}">${ESC(x.n.charAt(0).toUpperCase())}</div>
+    <div class="nm">${ESC(x.n)}${x.me?'<small>Tú</small>':''}</div><div class="pts">${fmt(x.p)} pts</div></div>`).join('');
+  return bar('Ranking','home')+`<main><div class="doc">
+    <section class="mcard"><span style="color:#F2A900">${ic('trophy',48)}</span><div><div class="mt">¡Buen trabajo, ${ESC(S.name)}!</div><div class="ms">Estás en el puesto <b>${pos}</b> de ${list.length}</div>${starsRow()}</div></section>
+    ${rows}</div></main>`;
+}
+
+function creditsScreen(){
+  return bar('Créditos','home')+`<main><div class="doc">
+    <section class="mcard">${MASCOT()}<div><div class="mt">NeoLectura</div><div class="ms">Plantilla de lectura dinámica</div></div></section>
+    <section class="set credit"><h4><span style="color:var(--teal)">${ic('book',22)}</span>Cuentos</h4><p>Fábulas clásicas de la tradición de Esopo, adaptadas y ampliadas para lectores en formación.</p></section>
+    <section class="set credit"><h4><span style="color:var(--teal)">${ic('star',22)}</span>Ilustraciones</h4><p>Arte vectorial creado para este prototipo. Puedes reemplazarlo por tus propias fotos en la configuración de cada cuento.</p></section>
+    <section class="set credit"><h4><span style="color:var(--teal)">${ic('vol',22)}</span>Lectura en voz alta</h4><p>Usa la voz del navegador o del dispositivo, por lo que puede sonar distinto según el equipo.</p></section>
+  </div></main>`;
+}
+
+function settingsScreen(){
+  const themes=[['auto','Automático'],['light','Claro'],['dark','Oscuro']];
+  return bar('Opciones','home')+`<main><div class="doc">
+    <section class="mcard"><span style="color:var(--blue)">${ic('gear',44)}</span><div><div class="mt">Opciones</div><div class="ms">Ajusta NeoLectura a tu gusto</div></div></section>
+    <section class="set"><h4>Tu nombre</h4><p>Aparece en la pantalla principal y en el ranking.</p><input id="setname" class="inp" maxlength="14" value="${ESC(S.name)}" autocomplete="off" aria-label="Tu nombre"></section>
+    <section class="set"><h4>Tamaño de letra</h4><p>Cambia el tamaño del texto de los cuentos.</p>
+      <div class="chips">${SIZE_NAMES.map((n,i)=>`<button class="chip ${S.size===i?'on':''}" data-a="size" data-i="${i}">${n}</button>`).join('')}</div>
+      <p class="prev" style="font-size:var(--fs)">Así se verá el texto del cuento.</p></section>
+    <section class="set two"><div><h4>Lectura en voz alta</h4><p>Muestra el botón «Escuchar» en cada parte del cuento.</p></div>
+      <button class="sw ${S.voice?'on':''}" data-a="voice" role="switch" aria-checked="${S.voice}" aria-label="Lectura en voz alta"></button></section>
+    <section class="set"><h4>Tema</h4><p>El modo Claro es el diseño original.</p>
+      <div class="chips">${themes.map(([v,n])=>`<button class="chip ${S.theme===v?'on':''}" data-a="theme" data-v="${v}">${n}</button>`).join('')}</div></section>
+    <section class="set"><h4>Progreso</h4><p>Borra tus puntos y niveles para empezar de nuevo.</p><button class="btn danger" data-a="reset" style="margin-top:12px">Reiniciar progreso</button></section>
+  </div></main>`;
+}
+
+function loginScreen(){
+  return `<div class="login"><div class="lcard">${MASCOT(84)}<h1>NeoLectura</h1><p>¡Hola! ¿Cómo te llamas?</p>
+    <input id="lname" class="inp" maxlength="14" value="${ESC(S.name)}" autocomplete="off" aria-label="Tu nombre">
+    <button class="btn pri" data-a="enter" style="width:100%">Entrar</button></div></div>`;
+}
+
+/* =====================  NAVEGACIÓN  ===================== */
+const $app=document.getElementById('app');
+function applyPrefs(){
+  const r=document.documentElement;
+  r.style.setProperty('--fs',SIZES[S.size]||SIZES[0]);
+  if(S.theme==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',S.theme);
+}
+function render(){
+  applyPrefs();
+  let h;
+  if(S.out)h=loginScreen();
+  else if(R.s==='levels'&&story(R.sid)&&story(R.sid).open)h=levelsScreen(R.sid);
+  else if(R.s==='read'&&story(R.sid)&&story(R.sid).levels[R.l])h=readScreen(R);
+  else if(R.s==='quiz'&&Q)h=quizScreen();
+  else if(R.s==='ranking')h=rankScreen();
+  else if(R.s==='settings')h=settingsScreen();
+  else if(R.s==='credits')h=creditsScreen();
+  else{R={s:'home'};h=homeScreen()}
+  $app.innerHTML=h;
+}
+function parseTo(t){const a=t.split(':');return {s:a[0],sid:a[1],l:+a[2],p:+a[3]}}
+function go(r){
+  if(typeof r==='string')r=parseTo(r);
+  if((r.s==='read'||r.s==='quiz')&&!unlocked(r.sid,r.l))return;
+  if(r.s==='quiz'){
+    if(partsRead(r.sid,r.l)<PARTS){toast('Primero lee las 3 partes del nivel 📖');return}
+    Q={sid:r.sid,l:r.l,i:0,score:0,pick:null,end:false};
+  }
+  R=r;
+  try{window.speechSynthesis.cancel()}catch(e){}
+  try{history.pushState(r,'')}catch(e){}
+  render();window.scrollTo(0,0);
+}
+window.addEventListener('popstate',e=>{
+  R=e.state||{s:'home'};
+  if(R.s==='quiz')R={s:'levels',sid:R.sid};
+  render();
+});
+
+/* Avisos y diálogos */
+let tT;
+function toast(t){
+  let el=document.getElementById('toast');
+  if(!el){el=document.createElement('div');el.id='toast';el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}
+  el.textContent=t;el.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>el.classList.remove('show'),2000);
+}
+function ask(msg,label,fn){
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><p>${msg}</p><div class="mrow"><button class="btn ghost" data-m="no">Cancelar</button><button class="btn pri" data-m="yes">${label}</button></div></div>`;
+  m.addEventListener('click',e=>{const b=e.target.closest('[data-m]');
+    if(e.target===m||(b&&b.dataset.m==='no'))m.remove();else if(b){m.remove();fn()}});
+  document.body.appendChild(m);m.querySelector('[data-m="yes"]').focus();
+}
+
+/* Lógica de juego */
+function markRead(sid,l,p){
+  const k=kp(sid,l,p);
+  if(!S.parts[k]){S.parts[k]=true;S.points+=50;save();toast('+50 puntos ⭐')}
+}
+function finishQuiz(){
+  const L=story(Q.sid).levels[Q.l],n=L.quiz.length,k=kd(Q.sid,Q.l);
+  const prev=S.quiz[k]||0,delta=Math.max(0,Q.score-prev)*100;
+  const pass=Q.score>=Math.ceil(n/2),bonus=pass&&!S.done[k]?150:0;
+  S.quiz[k]=Math.max(prev,Q.score);
+  if(pass)S.done[k]=true;
+  S.points+=delta+bonus;save();
+  Q.end=true;Q.res={delta,bonus,pass};
+}
+function enter(){
+  const v=(document.getElementById('lname')||{}).value||'';
+  S.name=v.trim()||'Lector';S.out=false;save();R={s:'home'};render();window.scrollTo(0,0);
+}
+function speakText(){
+  if(!canSpeak)return;
+  try{
+    const ss=window.speechSynthesis;
+    if(ss.speaking){ss.cancel();return}
+    const u=new SpeechSynthesisUtterance(plain(story(R.sid).levels[R.l].parts[R.p].x));
+    u.lang='es-AR';u.rate=.9;ss.speak(u);
+  }catch(e){}
+}
+
+/* Eventos */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a]');if(!t)return;
+  const a=t.dataset.a,d=t.dataset;
+  switch(a){
+    case 'nav':go(d.to);break;
+    case 'cont':{
+      const sid=d.s,l=+d.l;let p=-1;
+      for(let j=0;j<PARTS;j++){if(!S.parts[kp(sid,l,j)]){p=j;break}}
+      go(p<0?{s:'quiz',sid,l}:{s:'read',sid,l,p});break;}
+    case 'next':{
+      markRead(R.sid,R.l,R.p);
+      go(R.p<PARTS-1?{s:'read',sid:R.sid,l:R.l,p:R.p+1}:{s:'quiz',sid:R.sid,l:R.l});break;}
+    case 'def':{
+      const b=document.getElementById('def');if(!b)break;
+      b.hidden=false;b.innerHTML='<b>'+ESC(d.w)+':</b> '+ESC(d.d);break;}
+    case 'speak':speakText();break;
+    case 'pick':{
+      if(Q.pick!=null)break;
+      const q=story(Q.sid).levels[Q.l].quiz[Q.i];
+      Q.pick=+d.i;if(Q.pick===q.a)Q.score++;render();break;}
+    case 'qnext':{
+      const n=story(Q.sid).levels[Q.l].quiz.length;
+      if(Q.i+1<n){Q.i++;Q.pick=null}else finishQuiz();
+      render();window.scrollTo(0,0);break;}
+    case 'size':S.size=+d.i;save();render();break;
+    case 'voice':S.voice=!S.voice;save();render();break;
+    case 'theme':S.theme=d.v;save();render();break;
+    case 'reset':ask('¿Seguro que quieres borrar tus puntos y niveles?','Reiniciar',()=>{
+      S.points=DEF.points;S.parts={};S.quiz={};S.done={};save();toast('Progreso reiniciado');render()});break;
+    case 'logout':ask('¿Quieres cerrar sesión? Tu progreso se guarda en este dispositivo.','Salir',()=>{S.out=true;save();render();window.scrollTo(0,0)});break;
+    case 'enter':enter();break;
+  }
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='setname'){S.name=e.target.value.trim()||'Lector';save()}
+});
+document.addEventListener('keydown',e=>{
+  const t=e.target;
+  if((e.key==='Enter'||e.key===' ')&&t.getAttribute&&t.getAttribute('role')==='button'){e.preventDefault();t.click()}
+  if(e.key==='Enter'&&t.id==='lname')enter();
+});
+
+try{history.replaceState({s:'home'},'')}catch(e){}
+render();
+</script>
+</body>
+</html>
